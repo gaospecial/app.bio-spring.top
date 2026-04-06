@@ -3,8 +3,8 @@ import './globals.css'
 import { AuthProvider } from '@/providers/AuthProvider'
 
 export const metadata: Metadata = {
-  title: 'LLM Usage - ChatAnywhere',
-  description: 'ChatAnywhere API 用量管理',
+  title: 'Bio Spring - 综合业务管理平台',
+  description: 'LLM 用量管理 · 数字土壤 · 考勤管理',
 }
 
 export default function RootLayout({
