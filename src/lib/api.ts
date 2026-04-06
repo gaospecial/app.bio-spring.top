@@ -4,6 +4,7 @@ import type {
   ApiResponse,
   TokenData,
   UserResponse,
+  ModuleInfo,
   ApiKey,
   ApiKeyCreate,
   ApiKeyUpdate,
@@ -64,6 +65,27 @@ export async function login(username: string, password: string): Promise<TokenDa
 export async function getMe(): Promise<UserResponse> {
   const res = await api.get('/api/v1/auth/me')
   return (res.data as ApiResponse<UserResponse>).data
+}
+
+export async function listUsers(): Promise<UserResponse[]> {
+  const res = await api.get('/api/v1/auth/users')
+  return (res.data as ApiResponse<UserResponse[]>).data
+}
+
+// ── Module Management ──
+
+export async function listModules(): Promise<ModuleInfo[]> {
+  const res = await api.get('/api/v1/auth/modules')
+  return (res.data as ApiResponse<ModuleInfo[]>).data
+}
+
+export async function getUserModules(userId: number): Promise<string[]> {
+  const res = await api.get(`/api/v1/auth/users/${userId}/modules`)
+  return (res.data as ApiResponse<string[]>).data
+}
+
+export async function setUserModules(userId: number, modules: string[]): Promise<void> {
+  await api.put(`/api/v1/auth/users/${userId}/modules`, { modules })
 }
 
 // ── Keys ──

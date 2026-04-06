@@ -28,6 +28,13 @@ export interface UserResponse {
   role: string
   is_active: boolean
   created_at: string
+  modules: string[]
+}
+
+export interface ModuleInfo {
+  id: string
+  label: string
+  icon: string
 }
 
 // ── API Key ──
