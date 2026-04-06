@@ -46,7 +46,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       clearToken()
       if (typeof window !== 'undefined') {
-        window.location.href = '/llm-usage/login'
+        window.location.href = '/login'
       }
     }
     const message = error.response?.data?.message || error.message || '网络错误'
