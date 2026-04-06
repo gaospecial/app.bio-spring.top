@@ -21,7 +21,7 @@ export default function LoginPage() {
     setLoading(true)
     try {
       await login(username, password)
-      router.push('/dashboard')
+      router.push('/')
     } catch (err) {
       setError(err instanceof Error ? err.message : '登录失败')
     } finally {
@@ -33,8 +33,8 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">LLM Usage</h1>
-          <p className="text-sm text-gray-500 mt-1">ChatAnywhere API 用量管理</p>
+          <h1 className="text-2xl font-bold text-gray-900">Bio Spring</h1>
+          <p className="text-sm text-gray-500 mt-1">多功能管理平台</p>
         </div>
         <Card>
           <form onSubmit={handleSubmit} className="space-y-4">
