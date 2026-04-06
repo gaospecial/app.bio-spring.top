@@ -16,7 +16,6 @@ export default function LoginPage() {
     setLoading(true)
     try {
       await login(username, password)
-      // Force a hard navigation so AuthProvider re-initializes with the new token
       window.location.href = '/'
     } catch (err) {
       setError(err instanceof Error ? err.message : '登录失败')
@@ -26,16 +25,16 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-xs">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white tracking-tight">Bio Spring</h1>
-          <p className="text-slate-400 mt-2 text-sm">综合业务管理平台</p>
+          <h1 className="text-2xl font-bold text-gray-900">Bio Spring</h1>
+          <p className="text-sm text-gray-500 mt-1">综合业务管理平台</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1.5">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               用户名
             </label>
             <input
@@ -44,12 +43,12 @@ export default function LoginPage() {
               onChange={(e) => setUsername(e.target.value)}
               placeholder="请输入用户名"
               required
-              className="w-full px-3.5 py-2.5 bg-white/5 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1.5">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               密码
             </label>
             <input
@@ -58,20 +57,18 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="请输入密码"
               required
-              className="w-full px-3.5 py-2.5 bg-white/5 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
 
           {error && (
-            <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-2.5 rounded-lg">
-              {error}
-            </div>
+            <p className="text-sm text-red-500">{error}</p>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-lg text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-950"
+            className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? '登录中...' : '登 录'}
           </button>
