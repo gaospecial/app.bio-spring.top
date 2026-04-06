@@ -1,11 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 
 export default function LoginPage() {
-  const router = useRouter()
   const { login } = useAuth()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -18,7 +16,8 @@ export default function LoginPage() {
     setLoading(true)
     try {
       await login(username, password)
-      router.push('/')
+      // Force a hard navigation so AuthProvider re-initializes with the new token
+      window.location.href = '/'
     } catch (err) {
       setError(err instanceof Error ? err.message : '登录失败')
     } finally {
