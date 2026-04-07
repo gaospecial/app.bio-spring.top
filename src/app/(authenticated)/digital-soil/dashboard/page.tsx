@@ -11,12 +11,22 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
 type TrendData = Record<number, OHLCItem[]>
 
+const RANGE_OPTIONS = [
+  { key: '7d' as const, label: '近7天', interval: '1h' as const, days: 7 },
+  { key: '30d' as const, label: '近30天', interval: '1d' as const, days: 30 },
+  { key: '90d' as const, label: '近90天', interval: '1w' as const, days: 90 },
+  { key: '1y' as const, label: '近1年', interval: '1M' as const, days: 365 },
+] as const
+
+type RangeKey = (typeof RANGE_OPTIONS)[number]['key']
+
 export default function DigitalSoilDashboard() {
   const [dashboard, setDashboard] = useState<SoilDashboard | null>(null)
   const [sensors, setSensors] = useState<SensorResponse[]>([])
   const [trends, setTrends] = useState<TrendData>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [timeRange, setTimeRange] = useState<RangeKey>('7d')
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -29,9 +39,9 @@ export default function DigitalSoilDashboard() {
       setDashboard(dash)
       setSensors(sensorList)
 
-      // 为每个有最新值的传感器拉取最近 7 天 OHLC 趋势
+      const opt = RANGE_OPTIONS.find(o => o.key === timeRange) ?? RANGE_OPTIONS[0]
       const end = new Date()
-      const start = new Date(end.getTime() - 7 * 24 * 60 * 60 * 1000)
+      const start = new Date(end.getTime() - opt.days * 24 * 60 * 60 * 1000)
       const toLocalISO = (d: Date) => {
         const pad = (n: number) => String(n).padStart(2, '0')
         return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
@@ -42,7 +52,7 @@ export default function DigitalSoilDashboard() {
           .map(async (s) => {
             try {
               const ohlc = await getSensorOHLC(s.id, {
-                interval: '1h',
+                interval: opt.interval,
                 start: toLocalISO(start),
                 end: toLocalISO(end),
               })
@@ -62,7 +72,7 @@ export default function DigitalSoilDashboard() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [timeRange])
 
   useEffect(() => { fetchData() }, [fetchData])
 
@@ -82,6 +92,9 @@ export default function DigitalSoilDashboard() {
     const raw = trends[sensor.id]
     if (!raw || raw.length === 0) return null
 
+    const opt = RANGE_OPTIONS.find(o => o.key === timeRange) ?? RANGE_OPTIONS[0]
+    const isHourly = opt.interval === '1h'
+
     // OHLC 返回按时间倒序，反转为正序（左侧早，右侧近）
     // 后端数据库 DateTime 无时区列存储的是 UTC 时间，需要 +8h 转为北京时间
     const ohlc = [...raw].reverse().map(d => {
@@ -100,19 +113,35 @@ export default function DigitalSoilDashboard() {
       }
     }
 
-    // 每日 0 点在 x 轴上的索引（北京时间）
-    const dayStarts = ohlc.reduce<number[]>((acc, d, i) => {
-      if (bjFields(d.bjMs).hour === '00') acc.push(i)
-      return acc
-    }, [])
+    // 对于小时级：splitLine 和 tick label 在每日 0 点
+    // 对于日/周/月级：每个数据点都显示日期 label，splitLine 在每周一
+    let dayStarts: number[]
+    let xData: string[]
 
-    const xData = ohlc.map((d, i) => {
-      if (dayStarts.includes(i)) {
+    if (isHourly) {
+      dayStarts = ohlc.reduce<number[]>((acc, d, i) => {
+        if (bjFields(d.bjMs).hour === '00') acc.push(i)
+        return acc
+      }, [])
+      xData = ohlc.map((d, i) => {
+        if (dayStarts.includes(i)) {
+          const f = bjFields(d.bjMs)
+          return `${f.month}/${f.day}`
+        }
+        return ''
+      })
+    } else {
+      // 日/周/月级：splitLine 在每周一（ISO weekday=1）
+      dayStarts = ohlc.reduce<number[]>((acc, d, i) => {
+        const dt = new Date(d.bjMs)
+        if (dt.getUTCDay() === 1) acc.push(i) // Monday
+        return acc
+      }, [])
+      xData = ohlc.map(d => {
         const f = bjFields(d.bjMs)
         return `${f.month}/${f.day}`
-      }
-      return ''
-    })
+      })
+    }
     const meanData = ohlc.map(d => ((Number(d.open) + Number(d.close)) / 2))
     const highData = ohlc.map(d => Number(d.high))
     const lowData = ohlc.map(d => Number(d.low))
@@ -123,12 +152,18 @@ export default function DigitalSoilDashboard() {
         formatter: (params: { seriesName: string; data: number; axisValueLabel: string; dataIndex: number }[]) => {
           const unit = sensor.unit || ''
           const f = bjFields(ohlc[params[0].dataIndex].bjMs)
-          const lines = params.map(p => `${p.seriesName}: ${p.data.toFixed(4)} ${unit}`)
-          return `<strong>${f.month}/${f.day} ${f.hour}:${f.minute}</strong><br/>${lines.join('<br/>')}`
+          const h = highData[params[0].dataIndex]
+          const l = lowData[params[0].dataIndex]
+          const m = meanData[params[0].dataIndex]
+          return [
+            `<strong>${f.month}/${f.day} ${f.hour}:${f.minute}</strong>`,
+            `均值: ${m.toFixed(4)} ${unit}`,
+            `最高: ${h.toFixed(4)} ${unit}`,
+            `最低: ${l.toFixed(4)} ${unit}`,
+          ].join('<br/>')
         },
       },
-      legend: { data: ['均值', '最高', '最低'], top: 0, textStyle: { fontSize: 11 } },
-      grid: { left: 50, right: 16, bottom: 40, top: 36 },
+      grid: { left: 50, right: 16, bottom: 40, top: 16 },
       xAxis: {
         type: 'category',
         data: xData,
@@ -138,8 +173,10 @@ export default function DigitalSoilDashboard() {
           fontWeight: 500,
           showMinLabel: true,
           showMaxLabel: true,
-          interval: 0,
-          formatter: (value: string) => value || ' ',
+          interval: isHourly ? 0 : 'auto',
+          formatter: isHourly
+            ? (value: string) => value || ' '
+            : undefined,
         },
         axisTick: { show: false },
         splitLine: {
@@ -157,30 +194,31 @@ export default function DigitalSoilDashboard() {
       },
       series: [
         {
-          name: '最高',
+          name: '下界',
           type: 'line',
-          data: highData,
-          lineStyle: { color: '#ef4444', width: 1, opacity: 0.4 },
+          data: lowData,
+          lineStyle: { opacity: 0 },
           symbol: 'none',
-          itemStyle: { color: '#ef4444' },
+          stack: 'band',
+          itemStyle: { color: 'transparent' },
+        },
+        {
+          name: '波动区间',
+          type: 'line',
+          data: lowData.map((l, i) => highData[i] - l),
+          lineStyle: { opacity: 0 },
+          symbol: 'none',
+          stack: 'band',
+          areaStyle: { color: 'rgba(59,130,246,0.15)' },
+          itemStyle: { color: 'transparent' },
         },
         {
           name: '均值',
           type: 'line',
           data: meanData,
           lineStyle: { color: '#3b82f6', width: 2 },
-          symbol: 'circle',
-          symbolSize: 4,
-          itemStyle: { color: '#3b82f6' },
-          areaStyle: { color: 'rgba(59,130,246,0.08)' },
-        },
-        {
-          name: '最低',
-          type: 'line',
-          data: lowData,
-          lineStyle: { color: '#22c55e', width: 1, opacity: 0.4 },
           symbol: 'none',
-          itemStyle: { color: '#22c55e' },
+          z: 10,
         },
       ],
     }
@@ -221,13 +259,29 @@ export default function DigitalSoilDashboard() {
         ))}
       </div>
 
-      {/* 按指标类型分组展示传感器近 7 天趋势 */}
+      {/* 按指标类型分组展示传感器趋势 */}
       {Object.entries(sensorsByUnit).map(([unit, group]) => (
         <div key={unit} className="space-y-3">
-          <h3 className="text-sm font-semibold text-gray-700">
-            {unit === '未知' ? '其他传感器' : `${unit} 类传感器`}
-            <span className="ml-2 text-xs font-normal text-gray-400">近 7 天趋势</span>
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-gray-700">
+              {unit === '未知' ? '其他传感器' : `${unit} 类传感器`}
+            </h3>
+            <div className="flex gap-1">
+              {RANGE_OPTIONS.map(opt => (
+                <button
+                  key={opt.key}
+                  onClick={() => setTimeRange(opt.key)}
+                  className={`px-2.5 py-1 text-xs rounded-full transition-colors ${
+                    timeRange === opt.key
+                      ? 'bg-blue-100 text-blue-700 font-medium'
+                      : 'text-gray-500 hover:bg-gray-100'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {group.map((sensor) => {
               const option = buildTrendOption(sensor)
