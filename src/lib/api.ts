@@ -15,6 +15,17 @@ import type {
   ByModelUsage,
   UsageDetailItem,
   DetailQuery,
+  SoilDashboard,
+  ProviderResponse,
+  ProviderDetail,
+  ProviderCreate,
+  ProviderUpdate,
+  SensorResponse,
+  SensorCreate,
+  SensorUpdate,
+  SensorValueItem,
+  SensorLatestResponse,
+  OHLCItem,
 } from './types'
 
 const api = axios.create({
@@ -161,3 +172,99 @@ export async function getDetails(query: DetailQuery): Promise<{
 }
 
 export default api
+
+// ── Soil Dashboard ──
+
+export async function getSoilDashboard(): Promise<SoilDashboard> {
+  const res = await api.get('/api/v1/soil/dashboard')
+  return (res.data as ApiResponse<SoilDashboard>).data
+}
+
+// ── Soil Providers ──
+
+export async function listSoilProviders(active?: boolean): Promise<ProviderResponse[]> {
+  const params: Record<string, string> = {}
+  if (active !== undefined) params.active = String(active)
+  const res = await api.get('/api/v1/soil/providers', { params })
+  return (res.data as ApiResponse<ProviderResponse[]>).data
+}
+
+export async function getSoilProvider(id: number): Promise<ProviderDetail> {
+  const res = await api.get(`/api/v1/soil/providers/${id}`)
+  return (res.data as ApiResponse<ProviderDetail>).data
+}
+
+export async function createSoilProvider(data: ProviderCreate): Promise<ProviderResponse> {
+  const res = await api.post('/api/v1/soil/providers', data)
+  return (res.data as ApiResponse<ProviderResponse>).data
+}
+
+export async function updateSoilProvider(id: number, data: ProviderUpdate): Promise<ProviderResponse> {
+  const res = await api.put(`/api/v1/soil/providers/${id}`, data)
+  return (res.data as ApiResponse<ProviderResponse>).data
+}
+
+export async function deleteSoilProvider(id: number): Promise<void> {
+  await api.delete(`/api/v1/soil/providers/${id}`)
+}
+
+// ── Soil Sensors ──
+
+export async function listSoilSensors(params?: {
+  provider_id?: number
+  active?: boolean
+  location?: string
+}): Promise<SensorResponse[]> {
+  const query: Record<string, string> = {}
+  if (params?.provider_id) query.provider_id = String(params.provider_id)
+  if (params?.active !== undefined) query.active = String(params.active)
+  if (params?.location) query.location = params.location
+  const res = await api.get('/api/v1/soil/sensors', { params: query })
+  return (res.data as ApiResponse<SensorResponse[]>).data
+}
+
+export async function updateSoilSensor(id: number, data: SensorUpdate): Promise<SensorResponse> {
+  const res = await api.put(`/api/v1/soil/sensors/${id}`, data)
+  return (res.data as ApiResponse<SensorResponse>).data
+}
+
+export async function deleteSoilSensor(id: number): Promise<void> {
+  await api.delete(`/api/v1/soil/sensors/${id}`)
+}
+
+// ── Soil Sensor Values ──
+
+export async function getSensorValues(
+  sensorId: number,
+  params?: { start?: string; end?: string; page?: number; page_size?: number }
+): Promise<{ items: SensorValueItem[]; meta: { page: number; page_size: number; total: number; total_pages: number; has_next: boolean; has_prev: boolean } }> {
+  const query: Record<string, string> = {}
+  if (params?.start) query.start = params.start
+  if (params?.end) query.end = params.end
+  if (params?.page) query.page = String(params.page)
+  if (params?.page_size) query.page_size = String(params.page_size)
+  const res = await api.get(`/api/v1/soil/sensors/${sensorId}/values`, { params: query })
+  const envelope = res.data as ApiResponse<SensorValueItem[]>
+  const fallback = { page: 1, page_size: 100, total: 0, total_pages: 0, has_next: false, has_prev: false }
+  return {
+    items: envelope.data,
+    meta: envelope.meta ? { ...fallback, ...envelope.meta } as typeof fallback : fallback,
+  }
+}
+
+export async function getSensorLatest(sensorId: number): Promise<SensorLatestResponse> {
+  const res = await api.get(`/api/v1/soil/sensors/${sensorId}/latest`)
+  return (res.data as ApiResponse<SensorLatestResponse>).data
+}
+
+export async function getSensorOHLC(
+  sensorId: number,
+  params?: { interval?: string; start?: string; end?: string }
+): Promise<OHLCItem[]> {
+  const query: Record<string, string> = {}
+  if (params?.interval) query.interval = params.interval
+  if (params?.start) query.start = params.start
+  if (params?.end) query.end = params.end
+  const res = await api.get(`/api/v1/soil/sensors/${sensorId}/ohlc`, { params: query })
+  return (res.data as ApiResponse<OHLCItem[]>).data
+}

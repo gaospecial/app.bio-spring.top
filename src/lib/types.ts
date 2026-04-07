@@ -153,3 +153,99 @@ export interface DetailQuery {
   page?: number
   page_size?: number
 }
+
+// ── Soil / 数字土壤 ──
+
+export interface SoilDashboard {
+  total_providers: number
+  active_providers: number
+  total_sensors: number
+  active_sensors: number
+  online_sensors: number
+  offline_sensors: number
+  today_data_points: number
+  latest_update: string | null
+}
+
+export interface ProviderResponse {
+  id: number
+  name: string
+  api_base_url: string
+  is_active: boolean
+  sensor_count: number
+  created_at: string
+}
+
+export interface ProviderDetail extends ProviderResponse {
+  api_key: string
+  config: string | null
+  updated_at: string
+}
+
+export interface ProviderCreate {
+  name: string
+  api_base_url: string
+  api_key: string
+  config?: string
+  is_active?: boolean
+}
+
+export interface ProviderUpdate {
+  name?: string
+  api_base_url?: string
+  api_key?: string
+  config?: string
+  is_active?: boolean
+}
+
+export interface SensorResponse {
+  id: number
+  provider_id: number
+  sensor_sn: string
+  name: string
+  location: string | null
+  unit: string | null
+  is_active: boolean
+  latest_value: string | null
+  latest_time: string | null
+  created_at: string
+}
+
+export interface SensorCreate {
+  provider_id: number
+  sensor_sn: string
+  name: string
+  location?: string
+  unit?: string
+  is_active?: boolean
+}
+
+export interface SensorUpdate {
+  name?: string
+  location?: string
+  unit?: string
+  is_active?: boolean
+}
+
+export interface SensorValueItem {
+  sensor_id: number
+  value: string
+  collected_at: string
+}
+
+export interface SensorLatestResponse {
+  sensor_id: number
+  sensor_name: string
+  value: string
+  unit: string | null
+  collected_at: string
+}
+
+export interface OHLCItem {
+  interval_start: string
+  open: string
+  high: string
+  low: string
+  close: string
+  count: number
+}
