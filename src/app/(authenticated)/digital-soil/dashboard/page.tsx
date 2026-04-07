@@ -32,15 +32,19 @@ export default function DigitalSoilDashboard() {
       // 为每个有最新值的传感器拉取最近 7 天 OHLC 趋势
       const end = new Date()
       const start = new Date(end.getTime() - 7 * 24 * 60 * 60 * 1000)
+      const toLocalISO = (d: Date) => {
+        const pad = (n: number) => String(n).padStart(2, '0')
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
+      }
       const results = await Promise.all(
         sensorList
           .filter(s => s.latest_value !== null)
           .map(async (s) => {
             try {
               const ohlc = await getSensorOHLC(s.id, {
-                interval: '1d',
-                start: start.toISOString(),
-                end: end.toISOString(),
+                interval: '1h',
+                start: toLocalISO(start),
+                end: toLocalISO(end),
               })
               return { id: s.id, ohlc }
             } catch {
@@ -75,12 +79,39 @@ export default function DigitalSoilDashboard() {
 
   // 构建单个传感器的趋势图配置
   const buildTrendOption = (sensor: SensorResponse) => {
-    const ohlc = trends[sensor.id]
-    if (!ohlc || ohlc.length === 0) return null
+    const raw = trends[sensor.id]
+    if (!raw || raw.length === 0) return null
 
-    const xData = ohlc.map(d => {
-      const dt = new Date(d.interval_start)
-      return `${dt.getMonth() + 1}/${dt.getDate()}`
+    // OHLC 返回按时间倒序，反转为正序（左侧早，右侧近）
+    // 后端数据库 DateTime 无时区列存储的是 UTC 时间，需要 +8h 转为北京时间
+    const ohlc = [...raw].reverse().map(d => {
+      const utc = new Date(d.interval_start + 'Z')  // 显式标记为 UTC
+      return { ...d, bjMs: utc.getTime() + 8 * 3600000 }
+    })
+
+    // 从北京时间毫秒值提取字段
+    const bjFields = (ms: number) => {
+      const d = new Date(ms)
+      return {
+        month: String(d.getUTCMonth() + 1),
+        day: String(d.getUTCDate()),
+        hour: String(d.getUTCHours()).padStart(2, '0'),
+        minute: String(d.getUTCMinutes()).padStart(2, '0'),
+      }
+    }
+
+    // 每日 0 点在 x 轴上的索引（北京时间）
+    const dayStarts = ohlc.reduce<number[]>((acc, d, i) => {
+      if (bjFields(d.bjMs).hour === '00') acc.push(i)
+      return acc
+    }, [])
+
+    const xData = ohlc.map((d, i) => {
+      if (dayStarts.includes(i)) {
+        const f = bjFields(d.bjMs)
+        return `${f.month}/${f.day}`
+      }
+      return ''
     })
     const meanData = ohlc.map(d => ((Number(d.open) + Number(d.close)) / 2))
     const highData = ohlc.map(d => Number(d.high))
@@ -89,19 +120,33 @@ export default function DigitalSoilDashboard() {
     return {
       tooltip: {
         trigger: 'axis',
-        formatter: (params: { seriesName: string; data: number; axisValueLabel: string }[]) => {
+        formatter: (params: { seriesName: string; data: number; axisValueLabel: string; dataIndex: number }[]) => {
           const unit = sensor.unit || ''
+          const f = bjFields(ohlc[params[0].dataIndex].bjMs)
           const lines = params.map(p => `${p.seriesName}: ${p.data.toFixed(4)} ${unit}`)
-          return `<strong>${params[0].axisValueLabel}</strong><br/>${lines.join('<br/>')}`
+          return `<strong>${f.month}/${f.day} ${f.hour}:${f.minute}</strong><br/>${lines.join('<br/>')}`
         },
       },
       legend: { data: ['均值', '最高', '最低'], top: 0, textStyle: { fontSize: 11 } },
-      grid: { left: 50, right: 16, bottom: 24, top: 36 },
+      grid: { left: 50, right: 16, bottom: 40, top: 36 },
       xAxis: {
         type: 'category',
         data: xData,
-        axisLabel: { fontSize: 10 },
+        axisLabel: {
+          fontSize: 10,
+          color: '#6b7280',
+          fontWeight: 500,
+          showMinLabel: true,
+          showMaxLabel: true,
+          interval: 0,
+          formatter: (value: string) => value || ' ',
+        },
         axisTick: { show: false },
+        splitLine: {
+          show: true,
+          lineStyle: { color: '#e5e7eb', type: 'dashed', width: 1 },
+          interval: (index: number) => dayStarts.includes(index),
+        },
       },
       yAxis: {
         type: 'value',
