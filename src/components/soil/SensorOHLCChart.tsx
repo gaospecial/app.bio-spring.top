@@ -39,7 +39,7 @@ export default function SensorOHLCChart({ data, sensorName, unit, loading, inter
     )
   }
 
-  const xData = data.map(d => new Date(d.interval_start).toLocaleDateString('zh-CN', {
+  const xData = data.map(d => new Date(d.interval_start + 'Z').toLocaleDateString('zh-CN', {
     month: 'short',
     day: 'numeric',
     ...(interval === '1h' ? { hour: '2-digit', minute: '2-digit' } : {}),

@@ -1,6 +1,7 @@
 'use client'
 
 import type { SensorResponse } from '@/lib/types'
+import { formatDateTime } from '@/lib/time'
 import Badge from '@/components/ui/Badge'
 
 interface SensorTableProps {
@@ -45,7 +46,7 @@ export default function SensorTable({ sensors, providerName, onEdit, onDelete }:
                   </td>
                   <td className="px-4 py-3 text-gray-500">{s.unit || '-'}</td>
                   <td className="px-4 py-3 text-xs text-gray-400">
-                    {s.latest_time ? new Date(s.latest_time).toLocaleString('zh-CN') : '-'}
+                    {s.latest_time ? formatDateTime(s.latest_time) : '-'}
                   </td>
                   <td className="px-4 py-3 text-center">
                     {s.is_active ? (

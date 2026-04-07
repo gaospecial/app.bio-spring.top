@@ -1,4 +1,5 @@
 import Card from '@/components/ui/Card'
+import { formatDateTime } from '@/lib/time'
 import type { KeySummary } from '@/lib/types'
 
 interface KeySummaryTableProps {
@@ -31,7 +32,7 @@ export default function KeySummaryTable({ keys }: KeySummaryTableProps) {
                   <td className="py-2.5 text-right text-orange-600">${used.toFixed(2)}</td>
                   <td className="py-2.5 text-right text-green-600">${remaining.toFixed(2)}</td>
                   <td className="py-2.5 pl-4 text-gray-400 text-xs">
-                    {key.last_collected_at ? new Date(key.last_collected_at).toLocaleString('zh-CN') : '-'}
+                    {key.last_collected_at ? formatDateTime(key.last_collected_at) : '-'}
                   </td>
                 </tr>
               )

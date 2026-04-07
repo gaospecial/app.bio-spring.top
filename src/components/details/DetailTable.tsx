@@ -1,6 +1,7 @@
 'use client'
 
 import type { UsageDetailItem } from '@/lib/types'
+import { formatDateTime } from '@/lib/time'
 import Pagination from '@/components/ui/Pagination'
 
 interface DetailTableProps {
@@ -47,7 +48,7 @@ export default function DetailTable({ items, page, pageSize, total, onPageChange
                   <td className="px-4 py-3 text-right">{item.output_tokens.toLocaleString()}</td>
                   <td className="px-4 py-3 text-right">${Number(item.total_cost).toFixed(4)}</td>
                   <td className="px-4 py-3 text-xs text-gray-500">
-                    {new Date(item.collected_at).toLocaleString('zh-CN')}
+                    {formatDateTime(item.collected_at)}
                   </td>
                 </tr>
               ))

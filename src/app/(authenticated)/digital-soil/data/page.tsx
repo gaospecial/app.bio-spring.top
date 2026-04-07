@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { listSoilSensors, getSensorOHLC, getSensorValues } from '@/lib/api'
+import { formatDateTime } from '@/lib/time'
 import type { SensorResponse, OHLCItem, SensorValueItem } from '@/lib/types'
 import SensorOHLCChart from '@/components/soil/SensorOHLCChart'
 import Select from '@/components/ui/Select'
@@ -168,7 +169,7 @@ export default function DataQueryPage() {
                     values.map((v, i) => (
                       <tr key={`${v.collected_at}-${i}`} className="hover:bg-gray-50">
                         <td className="px-4 py-3">
-                          {new Date(v.collected_at).toLocaleString('zh-CN')}
+                          {formatDateTime(v.collected_at)}
                         </td>
                         <td className="px-4 py-3 text-right font-semibold">
                           {Number(v.value).toFixed(4)}
