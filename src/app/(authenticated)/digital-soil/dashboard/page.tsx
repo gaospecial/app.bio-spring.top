@@ -32,7 +32,6 @@ export default function DigitalSoilDashboard() {
       // 为每个有最新值的传感器拉取最近 7 天 OHLC 趋势
       const end = new Date()
       const start = new Date(end.getTime() - 7 * 24 * 60 * 60 * 1000)
-      console.log('[OHLC] fetching trends for', sensorList.filter(s => s.latest_value !== null).length, 'sensors, range:', start.toISOString(), '-', end.toISOString())
       const results = await Promise.all(
         sensorList
           .filter(s => s.latest_value !== null)
@@ -43,10 +42,8 @@ export default function DigitalSoilDashboard() {
                 start: start.toISOString(),
                 end: end.toISOString(),
               })
-              console.log('[OHLC] sensor', s.id, s.name, '→', ohlc.length, 'items')
               return { id: s.id, ohlc }
-            } catch (e) {
-              console.error('[OHLC] sensor', s.id, s.name, 'FAILED:', e)
+            } catch {
               return { id: s.id, ohlc: [] }
             }
           })
