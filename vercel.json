@@ -1,0 +1,3 @@
+{
+  "buildCommand": "next build; mkdir -p '.next/server/app/(authenticated)' && touch '.next/server/app/(authenticated)/page_client-reference-manifest.js'"
+}
