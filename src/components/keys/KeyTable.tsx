@@ -19,6 +19,7 @@ export default function KeyTable({ keys, onEdit, onDelete, onCollect, collecting
         <thead className="bg-gray-50">
           <tr>
             <th className="px-4 py-3 text-left font-medium text-gray-600">名称</th>
+            <th className="px-4 py-3 text-left font-medium text-gray-600">Provider</th>
             <th className="px-4 py-3 text-left font-medium text-gray-600">API Key</th>
             <th className="px-4 py-3 text-left font-medium text-gray-600">Base URL</th>
             <th className="px-4 py-3 text-center font-medium text-gray-600">状态</th>
@@ -29,12 +30,13 @@ export default function KeyTable({ keys, onEdit, onDelete, onCollect, collecting
         <tbody className="divide-y divide-gray-100">
           {keys.length === 0 ? (
             <tr>
-              <td colSpan={6} className="px-4 py-8 text-center text-gray-400">暂无 API Key</td>
+              <td colSpan={7} className="px-4 py-8 text-center text-gray-400">暂无 API Key</td>
             </tr>
           ) : (
             keys.map((key) => (
               <tr key={key.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3 font-medium">{key.name}</td>
+                <td className="px-4 py-3 text-xs text-gray-500">{key.provider || 'chatanywhere'}</td>
                 <td className="px-4 py-3 font-mono text-xs text-gray-500">{key.api_key}</td>
                 <td className="px-4 py-3 text-xs text-gray-500">{key.base_url}</td>
                 <td className="px-4 py-3 text-center">

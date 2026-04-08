@@ -8,9 +8,11 @@ import type {
   ApiKey,
   ApiKeyCreate,
   ApiKeyUpdate,
+  LlmProviderInfo,
   CollectResult,
   UsageSummary,
   DailyUsage,
+  DailyModelUsage,
   ByKeyUsage,
   ByModelUsage,
   UsageDetailItem,
@@ -125,6 +127,13 @@ export async function collectKey(id: number): Promise<CollectResult> {
   return (res.data as ApiResponse<CollectResult>).data
 }
 
+// ── Providers ──
+
+export async function listLlmProviders(): Promise<LlmProviderInfo[]> {
+  const res = await api.get('/api/v1/llm/providers')
+  return (res.data as ApiResponse<LlmProviderInfo[]>).data
+}
+
 // ── Usage ──
 
 export async function getSummary(): Promise<UsageSummary> {
@@ -137,6 +146,13 @@ export async function getDailyUsage(days = 30, keyId?: number): Promise<DailyUsa
   if (keyId) params.key_id = String(keyId)
   const res = await api.get('/api/v1/llm/usage/daily', { params })
   return (res.data as ApiResponse<DailyUsage[]>).data
+}
+
+export async function getDailyByModel(days = 30, keyId?: number): Promise<DailyModelUsage[]> {
+  const params: Record<string, string> = { days: String(days) }
+  if (keyId) params.key_id = String(keyId)
+  const res = await api.get('/api/v1/llm/usage/daily-by-model', { params })
+  return (res.data as ApiResponse<DailyModelUsage[]>).data
 }
 
 export async function getByKeyUsage(days = 30): Promise<ByKeyUsage[]> {

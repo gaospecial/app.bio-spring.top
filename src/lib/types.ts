@@ -43,6 +43,7 @@ export interface ApiKey {
   id: number
   name: string
   api_key: string
+  provider: string
   base_url: string
   is_active: boolean
   balance_total: string | null
@@ -55,6 +56,7 @@ export interface ApiKey {
 export interface ApiKeyCreate {
   name: string
   api_key: string
+  provider?: string
   base_url?: string
   is_active?: boolean
 }
@@ -62,8 +64,16 @@ export interface ApiKeyCreate {
 export interface ApiKeyUpdate {
   name?: string
   api_key?: string
+  provider?: string
   base_url?: string
   is_active?: boolean
+}
+
+export interface LlmProviderInfo {
+  type: string
+  name: string
+  description: string
+  base_url: string
 }
 
 // ── 采集结果 ──
@@ -107,6 +117,13 @@ export interface DailyUsage {
   total_usage: string
   total_tokens: number
   keys: DailyKeyUsage[]
+}
+
+export interface DailyModelUsage {
+  date: string
+  model_name: string
+  input_tokens: number
+  output_tokens: number
 }
 
 // ── 按 KEY 统计 ──
