@@ -37,10 +37,9 @@ export default function AuthenticatedHomeClient() {
                 href={mod.defaultRoute}
                 className="block bg-white rounded-xl border border-gray-200 p-5 hover:border-gray-300 hover:shadow-sm transition-all"
               >
-                <div className="text-2xl mb-2">{mod.icon}</div>
-                <h2 className="text-base font-semibold text-gray-900 mb-1">
-                  {mod.label}
-                </h2>
+                <div className="mb-2 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[32px]">{mod.icon}</span>
+                </div>
                 <p className="text-sm text-gray-500">{mod.description}</p>
               </Link>
             ))}

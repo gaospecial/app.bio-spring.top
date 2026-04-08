@@ -327,7 +327,6 @@ export default function DigitalSoilDashboard() {
                   <th className="text-left py-2 px-3 font-medium text-gray-600 hidden md:table-cell">位置</th>
                   <th className="text-left py-2 px-3 font-medium text-gray-600 hidden md:table-cell">序列号</th>
                   <th className="text-right py-2 px-3 font-medium text-gray-600">最新值</th>
-                  <th className="text-left py-2 px-3 font-medium text-gray-600 hidden sm:table-cell">单位</th>
                   <th className="text-left py-2 px-3 font-medium text-gray-600 hidden md:table-cell">最近采集</th>
                   <th className="text-center py-2 px-3 font-medium text-gray-600">状态</th>
                 </tr>
@@ -339,9 +338,10 @@ export default function DigitalSoilDashboard() {
                     <td className="py-2.5 px-3 text-gray-500 hidden md:table-cell">{s.location || '-'}</td>
                     <td className="py-2.5 px-3 font-mono text-xs text-gray-400 hidden md:table-cell">{s.sensor_sn}</td>
                     <td className="py-2.5 px-3 text-right font-semibold">
-                      {s.latest_value !== null ? Number(s.latest_value).toFixed(2) : '-'}
+                      {s.latest_value !== null ? (
+                        <>{Number(s.latest_value).toFixed(2)} <span className="text-xs font-normal text-gray-400">{s.unit}</span></>
+                      ) : '-'}
                     </td>
-                    <td className="py-2.5 px-3 text-gray-500 hidden sm:table-cell">{s.unit || '-'}</td>
                     <td className="py-2.5 px-3 text-xs text-gray-400 hidden md:table-cell">
                       {s.latest_time ? formatDateTime(s.latest_time) : '-'}
                     </td>
