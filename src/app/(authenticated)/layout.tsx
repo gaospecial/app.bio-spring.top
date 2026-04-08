@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import Sidebar from '@/components/layout/Sidebar'
@@ -14,6 +14,7 @@ export default function AuthenticatedLayout({
 }) {
   const router = useRouter()
   const { isLoggedIn, loading } = useAuth()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
     if (!loading && !isLoggedIn) {
@@ -31,10 +32,10 @@ export default function AuthenticatedLayout({
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
-      <div className="flex-1 ml-56">
-        <Header />
-        <main className="p-6 bg-gray-50 min-h-[calc(100vh-3.5rem)]">
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <div className="flex-1 md:ml-56">
+        <Header onToggleSidebar={() => setSidebarOpen(v => !v)} />
+        <main className="p-4 md:p-6 bg-gray-50 min-h-[calc(100vh-3.5rem)]">
           {children}
         </main>
       </div>

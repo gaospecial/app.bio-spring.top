@@ -5,7 +5,12 @@ import { usePathname } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { MODULE_REGISTRY } from '@/lib/moduleRegistry'
 
-export default function Sidebar() {
+interface SidebarProps {
+  open: boolean
+  onClose: () => void
+}
+
+export default function Sidebar({ open, onClose }: SidebarProps) {
   const pathname = usePathname()
   const { user } = useAuth()
 
@@ -20,7 +25,19 @@ export default function Sidebar() {
   ) || availableModules[0]
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-56 bg-slate-900 text-white flex flex-col">
+    <>
+      {/* 移动端遮罩 */}
+      {open && (
+        <div
+          className="fixed inset-0 bg-black/40 z-40 md:hidden"
+          onClick={onClose}
+        />
+      )}
+      <aside
+        className={`fixed left-0 top-0 h-screen w-56 bg-slate-900 text-white flex-col z-50 ${
+          open ? 'flex translate-x-0' : 'hidden -translate-x-full'
+        } md:flex md:translate-x-0`}
+      >
       <div className="px-5 py-5 border-b border-slate-700">
         <h1 className="text-lg font-bold">Bio Spring</h1>
         <p className="text-xs text-slate-400 mt-0.5">{activeModule?.label}</p>
@@ -36,19 +53,21 @@ export default function Sidebar() {
               <Link
                 key={item.href}
                 href={href}
+                onClick={onClose}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   active
                     ? 'bg-slate-700 text-white'
                     : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                 }`}
               >
-                <span>{item.icon}</span>
+                <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
                 <span>{item.label}</span>
               </Link>
             )
           })}
         </nav>
       )}
-    </aside>
+      </aside>
+    </>
   )
 }

@@ -14,8 +14,66 @@ interface SensorTableProps {
 export default function SensorTable({ sensors, providerName, onEdit, onDelete }: SensorTableProps) {
   return (
     <div className="bg-white rounded-lg border border-gray-200">
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+      {/* 移动端卡片列表 */}
+      <div className="md:hidden">
+        {sensors.length === 0 ? (
+          <div className="py-8 text-center text-gray-400 text-sm">暂无传感器数据</div>
+        ) : (
+          sensors.map((s) => (
+            <div key={s.id} className="p-4 border-b border-gray-100 last:border-b-0">
+              <div className="flex justify-between items-start">
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-sm truncate">{s.name}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">{s.sensor_sn}</p>
+                </div>
+                <div className="ml-2 shrink-0">
+                  {s.is_active ? (
+                    <Badge variant="success">启用</Badge>
+                  ) : (
+                    <Badge variant="default">停用</Badge>
+                  )}
+                </div>
+              </div>
+              <div className="flex justify-between items-center mt-2.5">
+                <div className="text-sm text-gray-600">
+                  {s.latest_value !== null ? (
+                    <span>
+                      <span className="font-semibold">{Number(s.latest_value).toFixed(2)}</span>
+                      <span className="text-gray-400 ml-1">{s.unit || ''}</span>
+                    </span>
+                  ) : (
+                    <span className="text-gray-400">-</span>
+                  )}
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => onEdit(s)}
+                    className="text-blue-600 hover:text-blue-800 text-xs font-medium"
+                  >
+                    编辑
+                  </button>
+                  <button
+                    onClick={() => onDelete(s)}
+                    className="text-red-600 hover:text-red-800 text-xs font-medium"
+                  >
+                    删除
+                  </button>
+                </div>
+              </div>
+              {(s.location || s.latest_time) && (
+                <div className="flex gap-4 mt-1.5 text-xs text-gray-400">
+                  {s.location && <span>{s.location}</span>}
+                  {s.latest_time && <span>{formatDateTime(s.latest_time)}</span>}
+                </div>
+              )}
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* 桌面端表格 */}
+      <div className="hidden md:block overflow-x-auto">
+        <table className="w-full text-sm whitespace-nowrap">
           <thead className="bg-gray-50">
             <tr>
               <th className="px-4 py-3 text-left font-medium text-gray-600">名称</th>

@@ -87,7 +87,7 @@ export default function DataQueryPage() {
       </div>
 
       <div className="bg-white rounded-lg border border-gray-200 p-4">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
           <Select
             label="传感器"
             value={selectedSensorId}
@@ -124,7 +124,7 @@ export default function DataQueryPage() {
             onChange={(e) => setEndDate(e.target.value)}
           />
           <div className="flex items-end">
-            <Button onClick={handleSearch}>查询</Button>
+            <Button onClick={handleSearch} className="w-full sm:w-auto">查询</Button>
           </div>
         </div>
       </div>
@@ -148,7 +148,7 @@ export default function DataQueryPage() {
               <h3 className="text-sm font-semibold text-gray-700">采集数据明细</h3>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full text-sm whitespace-nowrap">
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-4 py-3 text-left font-medium text-gray-600">采集时间</th>

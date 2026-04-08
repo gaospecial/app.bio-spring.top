@@ -241,15 +241,15 @@ export default function DigitalSoilDashboard() {
         <h2 className="text-xl font-bold text-gray-900">数字土壤 - 总览</h2>
         <p className="text-sm text-gray-500 mt-1">
           土壤物联网数据采集与可视化
-          {dashboard.latest_update && (
-            <span className="ml-2">
-              最近更新: {formatDateTime(dashboard.latest_update)}
-            </span>
-          )}
         </p>
+        {dashboard.latest_update && (
+          <p className="text-xs text-gray-400 mt-0.5">
+            最近更新: {formatDateTime(dashboard.latest_update)}
+          </p>
+        )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         {stats.map((s) => (
           <Card key={s.label}>
             <p className="text-sm text-gray-500">{s.label}</p>
@@ -266,7 +266,7 @@ export default function DigitalSoilDashboard() {
             <h3 className="text-sm font-semibold text-gray-700">
               {unit === '未知' ? '其他传感器' : `${unit} 类传感器`}
             </h3>
-            <div className="flex gap-1">
+            <div className="flex flex-wrap gap-1">
               {RANGE_OPTIONS.map(opt => (
                 <button
                   key={opt.key}
@@ -287,10 +287,10 @@ export default function DigitalSoilDashboard() {
               const option = buildTrendOption(sensor)
               return (
                 <Card key={sensor.id}>
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0 mb-3">
+                    <div className="flex flex-wrap items-center gap-1">
                       <span className="text-sm font-semibold text-gray-900">{sensor.name}</span>
-                      <span className="ml-2 text-xs text-gray-400 font-mono">{sensor.sensor_sn}</span>
+                      <span className="text-xs text-gray-400 font-mono">{sensor.sensor_sn}</span>
                     </div>
                     <div className="text-right">
                       {sensor.latest_value !== null && (
@@ -302,7 +302,7 @@ export default function DigitalSoilDashboard() {
                     </div>
                   </div>
                   {option ? (
-                    <ReactECharts option={option} style={{ height: 200 }} />
+                    <ReactECharts option={option} style={{ height: 180 }} />
                   ) : (
                     <div className="h-32 flex items-center justify-center text-gray-300 text-sm">
                       暂无历史数据
@@ -320,32 +320,32 @@ export default function DigitalSoilDashboard() {
           <div className="text-center text-gray-400 py-6">暂无传感器数据</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm whitespace-nowrap">
               <thead>
                 <tr className="border-b border-gray-100">
-                  <th className="text-left py-2 font-medium text-gray-600">名称</th>
-                  <th className="text-left py-2 font-medium text-gray-600">位置</th>
-                  <th className="text-left py-2 font-medium text-gray-600">序列号</th>
-                  <th className="text-right py-2 font-medium text-gray-600">最新值</th>
-                  <th className="text-left py-2 font-medium text-gray-600 pl-4">单位</th>
-                  <th className="text-left py-2 font-medium text-gray-600 pl-4">最近采集</th>
-                  <th className="text-center py-2 font-medium text-gray-600">状态</th>
+                  <th className="text-left py-2 px-3 font-medium text-gray-600">名称</th>
+                  <th className="text-left py-2 px-3 font-medium text-gray-600 hidden md:table-cell">位置</th>
+                  <th className="text-left py-2 px-3 font-medium text-gray-600 hidden md:table-cell">序列号</th>
+                  <th className="text-right py-2 px-3 font-medium text-gray-600">最新值</th>
+                  <th className="text-left py-2 px-3 font-medium text-gray-600 hidden sm:table-cell">单位</th>
+                  <th className="text-left py-2 px-3 font-medium text-gray-600 hidden md:table-cell">最近采集</th>
+                  <th className="text-center py-2 px-3 font-medium text-gray-600">状态</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {sensors.map((s) => (
                   <tr key={s.id}>
-                    <td className="py-2.5 font-medium">{s.name}</td>
-                    <td className="py-2.5 text-gray-500">{s.location || '-'}</td>
-                    <td className="py-2.5 font-mono text-xs text-gray-400">{s.sensor_sn}</td>
-                    <td className="py-2.5 text-right font-semibold">
+                    <td className="py-2.5 px-3 font-medium">{s.name}</td>
+                    <td className="py-2.5 px-3 text-gray-500 hidden md:table-cell">{s.location || '-'}</td>
+                    <td className="py-2.5 px-3 font-mono text-xs text-gray-400 hidden md:table-cell">{s.sensor_sn}</td>
+                    <td className="py-2.5 px-3 text-right font-semibold">
                       {s.latest_value !== null ? Number(s.latest_value).toFixed(2) : '-'}
                     </td>
-                    <td className="py-2.5 pl-4 text-gray-500">{s.unit || '-'}</td>
-                    <td className="py-2.5 pl-4 text-xs text-gray-400">
+                    <td className="py-2.5 px-3 text-gray-500 hidden sm:table-cell">{s.unit || '-'}</td>
+                    <td className="py-2.5 px-3 text-xs text-gray-400 hidden md:table-cell">
                       {s.latest_time ? formatDateTime(s.latest_time) : '-'}
                     </td>
-                    <td className="py-2.5 text-center">
+                    <td className="py-2.5 px-3 text-center">
                       {s.is_active ? (
                         <Badge variant="success">启用</Badge>
                       ) : (

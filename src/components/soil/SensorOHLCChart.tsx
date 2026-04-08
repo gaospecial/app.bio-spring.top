@@ -107,7 +107,7 @@ export default function SensorOHLCChart({ data, sensorName, unit, loading, inter
       <h3 className="font-semibold text-gray-900 mb-4">
         {sensorName} - 趋势图（按{intervalLabels[interval] || interval}聚合）
       </h3>
-      <ReactECharts option={option} style={{ height: 400 }} />
+      <ReactECharts option={option} style={{ height: 280 }} />
     </div>
   )
 }
