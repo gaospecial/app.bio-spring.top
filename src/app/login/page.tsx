@@ -16,7 +16,7 @@ export default function LoginPage() {
     setLoading(true)
     try {
       await login(username, password)
-      window.location.href = '/llm-usage/dashboard'
+      window.location.href = '/'
     } catch (err) {
       setError(err instanceof Error ? err.message : '登录失败')
     } finally {
