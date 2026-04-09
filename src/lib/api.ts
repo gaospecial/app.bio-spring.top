@@ -80,6 +80,10 @@ export async function getMe(): Promise<UserResponse> {
   return (res.data as ApiResponse<UserResponse>).data
 }
 
+export async function changePassword(data: { old_password: string; new_password: string }): Promise<void> {
+  await api.put('/api/v1/auth/password', data)
+}
+
 export async function listUsers(): Promise<UserResponse[]> {
   const res = await api.get('/api/v1/auth/users')
   return (res.data as ApiResponse<UserResponse[]>).data

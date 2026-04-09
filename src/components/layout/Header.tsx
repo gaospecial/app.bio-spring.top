@@ -74,6 +74,12 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
         <span className="hidden sm:inline text-sm text-gray-600 truncate max-w-[120px]">
           {user?.display_name || user?.username}
         </span>
+        <Link
+          href="/profile"
+          className="hidden sm:inline text-sm text-gray-500 hover:text-gray-900 transition-colors"
+        >
+          修改密码
+        </Link>
         <button
           onClick={logout}
           className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
