@@ -15,17 +15,18 @@ export default function ByModelChart({ data }: ByModelChartProps) {
 
   const option = {
     tooltip: { trigger: 'item', formatter: '{b}: ${c} ({d}%)' },
-    legend: { orient: 'vertical', right: 'right' },
+    legend: { show: false },
     series: [
       {
         type: 'pie',
         radius: ['40%', '70%'],
+        center: ['50%', '50%'],
         avoidLabelOverlap: true,
-        label: { show: false, position: 'center' },
+        label: { show: true, formatter: '{b}' },
+        labelLine: { show: true },
         emphasis: {
-          label: { show: true, fontSize: 16, fontWeight: 'bold' },
+          label: { fontSize: 14, fontWeight: 'bold' },
         },
-        labelLine: { show: false },
         data: pieData,
       },
     ],
