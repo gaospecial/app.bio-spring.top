@@ -31,7 +31,7 @@ import type {
 } from './types'
 
 const api = axios.create({
-  baseURL: '',
+  baseURL: 'https://api.bio-spring.top',
   timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 })
