@@ -75,6 +75,10 @@ export async function login(username: string, password: string): Promise<TokenDa
   return (res.data as ApiResponse<TokenData>).data
 }
 
+export async function register(username: string, password: string): Promise<void> {
+  await api.post('/api/v1/auth/register', { username, password })
+}
+
 export async function getMe(): Promise<UserResponse> {
   const res = await api.get('/api/v1/auth/me')
   return (res.data as ApiResponse<UserResponse>).data
