@@ -318,6 +318,6 @@ export async function processBiogasPaper(paperId: string): Promise<{ id: string 
 }
 
 export async function listBiogasArticles(): Promise<BiogasArticle[]> {
-  const res = await api.get('/api/v1/biogas/articles')
+  const res = await api.get('/api/v1/biogas/admin/articles')
   return (res.data as ApiResponse<BiogasArticle[]>).data
 }
