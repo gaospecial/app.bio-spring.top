@@ -266,3 +266,39 @@ export interface OHLCItem {
   close: string
   count: number
 }
+
+// ── Biogas / 还田科普 ──
+
+export interface BiogasPaper {
+  id: number
+  title: string | null
+  authors: string | null
+  journal: string | null
+  year: number | null
+  file_size: number | null
+  status: string
+  error_message: string | null
+  article_id: string | null
+  created_at: string | null
+}
+
+export interface BiogasArticle {
+  id: string
+  title: string
+  subtitle: string | null
+  slug: string
+  category: string | null
+  status: string
+  published_at: string | null
+  created_at: string | null
+  understanding_points: string[] | null
+  content_md: string | null
+  source_citation: string | null
+}
+
+export interface BiogasInterpretation {
+  article_id: string
+  interpretation_md: string | null
+  understanding_points: string[] | null
+  generated_at: string | null
+}

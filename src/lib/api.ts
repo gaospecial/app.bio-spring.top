@@ -28,6 +28,8 @@ import type {
   SensorValueItem,
   SensorLatestResponse,
   OHLCItem,
+  BiogasPaper,
+  BiogasArticle,
 } from './types'
 
 const api = axios.create({
@@ -291,4 +293,31 @@ export async function getSensorOHLC(
   if (params?.end) query.end = params.end
   const res = await api.get(`/api/v1/soil/sensors/${sensorId}/ohlc`, { params: query })
   return (res.data as ApiResponse<OHLCItem[]>).data
+}
+
+// ── Biogas / 还田科普 ──
+
+export async function listBiogasPapers(): Promise<BiogasPaper[]> {
+  const res = await api.get('/api/v1/biogas/admin/papers')
+  return (res.data as ApiResponse<BiogasPaper[]>).data
+}
+
+export async function uploadBiogasPaper(file: File): Promise<{ id: string }> {
+  const formData = new FormData()
+  formData.append('file', file)
+  const res = await api.post('/api/v1/biogas/papers/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    timeout: 60000,
+  })
+  return (res.data as ApiResponse<{ id: string }>).data
+}
+
+export async function processBiogasPaper(paperId: string): Promise<{ id: string }> {
+  const res = await api.post(`/api/v1/biogas/papers/${paperId}/process`)
+  return (res.data as ApiResponse<{ id: string }>).data
+}
+
+export async function listBiogasArticles(): Promise<BiogasArticle[]> {
+  const res = await api.get('/api/v1/biogas/articles')
+  return (res.data as ApiResponse<BiogasArticle[]>).data
 }
