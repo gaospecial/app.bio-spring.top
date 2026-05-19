@@ -52,6 +52,19 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
       { href: '/rules', label: '规则设置', icon: 'settings' },
     ],
   },
+  {
+    id: 'biogas-literature',
+    label: '还田科普',
+    icon: 'agriculture',
+    description: '沼液还田文献管理：上传、解析、LLM 解读与问答。',
+    defaultRoute: '/biogas-literature/upload',
+    navItems: [
+      { href: '/upload', label: '文献上传', icon: 'upload_file' },
+      { href: '/parsing', label: 'PDF 解析', icon: 'description' },
+      { href: '/interpretation', label: 'LLM 解读', icon: 'psychology' },
+      { href: '/qa', label: '文献问答', icon: 'chat' },
+    ],
+  },
 ]
 
 export function getModuleById(id: string): ModuleDefinition | undefined {
