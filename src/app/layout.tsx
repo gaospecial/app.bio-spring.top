@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { AuthProvider } from '@/providers/AuthProvider'
+import { QueryProviders } from '@/providers/QueryProviders'
 
 export const metadata: Metadata = {
   title: 'Bio Spring - 综合业务管理平台',
@@ -21,7 +22,9 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        <AuthProvider>{children}</AuthProvider>
+        <QueryProviders>
+          <AuthProvider>{children}</AuthProvider>
+        </QueryProviders>
       </body>
     </html>
   )
