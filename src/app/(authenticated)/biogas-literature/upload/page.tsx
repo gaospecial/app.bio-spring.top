@@ -60,6 +60,7 @@ export default function BiogasUploadPage() {
           })
           .catch((err: unknown) => {
             const msg = err instanceof Error ? err.message : '未知错误'
+            console.error(`[biogas-upload] ${item.file.name}: ${msg}`, err)
             updateUpload(item.key, { status: 'error', error: msg })
           })
       }
