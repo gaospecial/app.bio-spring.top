@@ -6,6 +6,7 @@ import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import Button from '@/components/ui/Button'
 import type { BiogasArticle } from '@/lib/types'
+import { CROP_OPTIONS, SLURRY_TYPE_OPTIONS } from '@/lib/biogas-vocab'
 
 interface ArticleEditModalProps {
   open: boolean
@@ -17,12 +18,7 @@ interface ArticleEditModalProps {
 
 const CATEGORY_OPTIONS = [
   { label: '未分类', value: '' },
-  { label: '水稻', value: '水稻' },
-  { label: '小麦', value: '小麦' },
-  { label: '蔬菜', value: '蔬菜' },
-  { label: '果树', value: '果树' },
-  { label: '土壤改良', value: '土壤改良' },
-  { label: '综合', value: '综合' },
+  ...CROP_OPTIONS,
 ]
 
 const STATUS_OPTIONS = [
@@ -119,8 +115,8 @@ export default function ArticleEditModal({ open, article, onClose, onSave, savin
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <Input label="沼液类型" value={form.slurry_type} onChange={(e) => update('slurry_type', e.target.value)} />
-          <Input label="作物" value={form.crop} onChange={(e) => update('crop', e.target.value)} />
+          <Select label="沼液类型" options={[{ label: '未指定', value: '' }, ...SLURRY_TYPE_OPTIONS]} value={form.slurry_type} onChange={(e) => update('slurry_type', e.target.value)} />
+          <Select label="作物" options={[{ label: '未指定', value: '' }, ...CROP_OPTIONS]} value={form.crop} onChange={(e) => update('crop', e.target.value)} />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
