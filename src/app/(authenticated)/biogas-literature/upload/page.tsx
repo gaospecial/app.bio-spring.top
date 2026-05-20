@@ -1,9 +1,8 @@
 'use client'
 
 import { useCallback, useRef, useState } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { listBiogasPapers, uploadBiogasPaper, processBiogasPaper } from '@/lib/api'
-import type { BiogasPaper } from '@/lib/types'
+import { useQueryClient } from '@tanstack/react-query'
+import { uploadBiogasPaper, processBiogasPaper } from '@/lib/api'
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 
@@ -21,24 +20,12 @@ const UPLOAD_STATUS: Record<UploadItem['status'], { text: string; variant: 'defa
   error: { text: '失败', variant: 'error' },
 }
 
-const PAPER_STATUS: Record<string, { text: string; variant: 'default' | 'success' | 'warning' | 'error' }> = {
-  uploaded: { text: '已上传', variant: 'default' },
-  processing: { text: '处理中', variant: 'warning' },
-  completed: { text: '已完成', variant: 'success' },
-  failed: { text: '失败', variant: 'error' },
-}
-
 export default function BiogasUploadPage() {
   const [dragOver, setDragOver] = useState(false)
   const [uploads, setUploads] = useState<UploadItem[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
   const queryClient = useQueryClient()
   const nextKey = useRef(0)
-
-  const { data: papers, isLoading } = useQuery({
-    queryKey: ['biogas-papers'],
-    queryFn: listBiogasPapers,
-  })
 
   const updateUpload = useCallback(
     (key: string, patch: Partial<UploadItem>) => {
@@ -142,41 +129,6 @@ export default function BiogasUploadPage() {
           </ul>
         </Card>
       )}
-
-      <Card className="p-4">
-        <h3 className="text-sm font-medium text-gray-700 mb-3">已上传文献</h3>
-        {isLoading && <p className="text-sm text-gray-400">加载中...</p>}
-        {!isLoading && papers && papers.length === 0 && (
-          <p className="text-sm text-gray-400">暂无文献，请上传 PDF 文件。</p>
-        )}
-        {!isLoading && papers && papers.length > 0 && (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="text-gray-600">
-                <tr>
-                  <th className="px-3 py-2 font-medium">文件名</th>
-                  <th className="px-3 py-2 font-medium">状态</th>
-                  <th className="px-3 py-2 font-medium">上传时间</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {papers.map((paper) => {
-                  const cfg = PAPER_STATUS[paper.status] ?? { text: paper.status, variant: 'default' as const }
-                  return (
-                    <tr key={paper.id}>
-                      <td className="px-3 py-2 text-gray-900">{paper.title ?? String(paper.id)}</td>
-                      <td className="px-3 py-2"><Badge variant={cfg.variant}>{cfg.text}</Badge></td>
-                      <td className="px-3 py-2 text-gray-500">
-                        {paper.created_at ? new Date(paper.created_at).toLocaleString('zh-CN') : '-'}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </Card>
     </div>
   )
 }
