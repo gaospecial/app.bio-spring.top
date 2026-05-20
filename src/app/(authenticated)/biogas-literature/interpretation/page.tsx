@@ -1,75 +1,128 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
-import { listBiogasArticles } from '@/lib/api'
-import Card from '@/components/ui/Card'
+import { useState } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { listBiogasArticles, deleteBiogasArticle, updateBiogasArticle } from '@/lib/api'
+import type { BiogasArticle } from '@/lib/types'
+import Table from '@/components/ui/Table'
 import Badge from '@/components/ui/Badge'
-import ReactMarkdown from 'react-markdown'
+import Button from '@/components/ui/Button'
+import ConfirmDialog from '@/components/ui/ConfirmDialog'
+import ArticleEditModal from './ArticleEditModal'
 
 export default function BiogasInterpretationPage() {
+  const queryClient = useQueryClient()
+  const [editArticle, setEditArticle] = useState<BiogasArticle | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<BiogasArticle | null>(null)
+
   const { data: articles, isLoading } = useQuery({
     queryKey: ['biogas-articles'],
     queryFn: listBiogasArticles,
   })
 
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<BiogasArticle> }) =>
+      updateBiogasArticle(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['biogas-articles'] })
+      setEditArticle(null)
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (articleId: string) => deleteBiogasArticle(articleId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['biogas-articles'] })
+      setDeleteTarget(null)
+    },
+  })
+
+  const columns = [
+    {
+      key: 'title',
+      title: '标题',
+      render: (_: unknown, record: BiogasArticle) => (
+        <span className="text-gray-900 font-medium">{record.title}</span>
+      ),
+    },
+    {
+      key: 'category',
+      title: '分类',
+      render: (_: unknown, record: BiogasArticle) => (
+        record.category ? <Badge variant="default">{record.category}</Badge> : <span className="text-gray-400">-</span>
+      ),
+      className: 'w-28',
+    },
+    {
+      key: 'status',
+      title: '状态',
+      render: (_: unknown, record: BiogasArticle) => (
+        <Badge variant={record.status === 'published' ? 'success' : 'default'}>
+          {record.status === 'published' ? '已发布' : '草稿'}
+        </Badge>
+      ),
+      className: 'w-24',
+    },
+    {
+      key: 'published_at',
+      title: '发布时间',
+      render: (_: unknown, record: BiogasArticle) => (
+        <span className="text-xs text-gray-500">
+          {record.published_at ? new Date(record.published_at).toLocaleDateString('zh-CN') : '-'}
+        </span>
+      ),
+      className: 'w-32',
+    },
+    {
+      key: 'actions',
+      title: '操作',
+      render: (_: unknown, record: BiogasArticle) => (
+        <div className="flex items-center gap-1">
+          <Button variant="primary" size="sm" onClick={() => setEditArticle(record)}>
+            编辑
+          </Button>
+          <Button variant="danger" size="sm" onClick={() => setDeleteTarget(record)}>
+            删除
+          </Button>
+        </div>
+      ),
+      className: 'w-32',
+    },
+  ]
+
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-bold text-gray-900">LLM 解读</h2>
-        <p className="text-sm text-gray-500 mt-1">查看已生成的文献解读内容和要点</p>
+        <p className="text-sm text-gray-500 mt-1">管理已生成的文献解读内容</p>
       </div>
 
-      {isLoading && (
-        <Card className="p-8 text-center text-gray-400">加载中...</Card>
-      )}
+      <Table<BiogasArticle>
+        columns={columns}
+        data={articles ?? []}
+        rowKey="id"
+        loading={isLoading}
+      />
 
-      {!isLoading && articles && articles.length === 0 && (
-        <Card className="p-8 text-center text-gray-400">
-          暂无已解读的文章。请先完成 PDF 解析。
-        </Card>
-      )}
+      <ArticleEditModal
+        open={editArticle !== null}
+        article={editArticle}
+        onClose={() => setEditArticle(null)}
+        onSave={(id, data) => updateMutation.mutate({ id, data })}
+        saving={updateMutation.isPending}
+      />
 
-      {!isLoading && articles && articles.length > 0 && (
-        <div className="space-y-4">
-          {articles.map((article) => (
-            <Card key={article.id} className="p-5">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <h3 className="font-medium text-gray-900">{article.title}</h3>
-                  {article.subtitle && (
-                    <p className="text-sm text-gray-500 mt-1">{article.subtitle}</p>
-                  )}
-                </div>
-                <Badge variant={article.status === 'published' ? 'success' : 'default'}>
-                  {article.status}
-                </Badge>
-              </div>
-
-              {article.understanding_points && article.understanding_points.length > 0 && (
-                <div className="mb-3">
-                  <h4 className="text-xs font-medium text-gray-500 mb-2">要点</h4>
-                  <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
-                    {article.understanding_points.map((point, i) => (
-                      <li key={i}>{point}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {article.content_md && (
-                <div className="prose prose-sm max-w-none text-gray-600">
-                  <ReactMarkdown>{article.content_md.length > 500 ? article.content_md.slice(0, 500) + '...' : article.content_md}</ReactMarkdown>
-                </div>
-              )}
-
-              <div className="mt-3 flex items-center gap-4 text-xs text-gray-400">
-                {article.category && <span>分类: {article.category}</span>}
-                {article.published_at && <span>发布: {new Date(article.published_at).toLocaleDateString('zh-CN')}</span>}
-              </div>
-            </Card>
-          ))}
-        </div>
-      )}
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={() => {
+          if (deleteTarget) deleteMutation.mutate(String(deleteTarget.id))
+        }}
+        title="删除文章"
+        message={`确定要删除「${deleteTarget?.title}」吗？此操作不可恢复。`}
+        confirmText="删除"
+        loading={deleteMutation.isPending}
+      />
     </div>
   )
 }
