@@ -60,7 +60,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     defaultRoute: '/biogas-literature/upload',
     navItems: [
       { href: '/upload', label: '文献上传', icon: 'upload_file' },
-      { href: '/parsing', label: 'PDF 解析', icon: 'description' },
+      { href: '/parsing', label: '文献管理', icon: 'description' },
       { href: '/interpretation', label: 'LLM 解读', icon: 'psychology' },
       { href: '/qa', label: '文献问答', icon: 'chat' },
     ],

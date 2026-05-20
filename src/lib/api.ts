@@ -321,3 +321,24 @@ export async function listBiogasArticles(): Promise<BiogasArticle[]> {
   const res = await api.get('/api/v1/biogas/admin/articles')
   return (res.data as ApiResponse<BiogasArticle[]>).data
 }
+
+export async function deleteBiogasPaper(paperId: string): Promise<void> {
+  await api.delete(`/api/v1/biogas/admin/papers/${paperId}`)
+}
+
+export async function resetBiogasPaper(paperId: string): Promise<{ id: string }> {
+  const res = await api.post(`/api/v1/biogas/papers/${paperId}/reset`)
+  return (res.data as ApiResponse<{ id: string }>).data
+}
+
+export async function deleteBiogasArticle(articleId: string): Promise<void> {
+  await api.delete(`/api/v1/biogas/admin/articles/${articleId}`)
+}
+
+export async function updateBiogasArticle(
+  articleId: string,
+  data: Partial<BiogasArticle>
+): Promise<BiogasArticle> {
+  const res = await api.put(`/api/v1/biogas/admin/articles/${articleId}`, data)
+  return (res.data as ApiResponse<BiogasArticle>).data
+}

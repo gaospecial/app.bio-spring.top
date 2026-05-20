@@ -288,17 +288,22 @@ export interface BiogasArticle {
   subtitle: string | null
   slug: string
   category: string | null
-  status: string
-  published_at: string | null
-  created_at: string | null
+  tags: string[] | null
+  slurry_type: string | null
+  crop: string | null
+  soil_type: string | null
+  dosage: string | null
+  application_method: string | null
+  yield_benefit: string | null
+  quality_benefit: string | null
+  risk_control: string | null
   understanding_points: string[] | null
   content_md: string | null
   source_citation: string | null
-}
-
-export interface BiogasInterpretation {
-  article_id: string
-  interpretation_md: string | null
-  understanding_points: string[] | null
-  generated_at: string | null
+  authors: string | null
+  status: string
+  paper_id: number | null
+  published_at: string | null
+  created_at: string | null
+  updated_at: string | null
 }
