@@ -269,7 +269,7 @@ export interface OHLCItem {
 
 // ── Biogas / 还田科普 ──
 
-export interface BiogasPaper {
+export type BiogasPaper = {
   id: number
   title: string | null
   authors: string | null
@@ -282,7 +282,7 @@ export interface BiogasPaper {
   created_at: string | null
 }
 
-export interface BiogasArticle {
+export type BiogasArticle = {
   id: string
   title: string
   subtitle: string | null
