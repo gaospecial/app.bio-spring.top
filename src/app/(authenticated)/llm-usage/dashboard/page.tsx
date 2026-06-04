@@ -18,7 +18,7 @@ export default function DashboardPage() {
     setLoading(true)
     setError('')
     try {
-      const [s, d] = await Promise.all([getSummary(), getDailyUsage(7)])
+      const [s, d] = await Promise.all([getSummary(), getDailyUsage(14)])
       setSummary(s)
       setDailyUsage(d)
     } catch (err) {

@@ -81,7 +81,7 @@ export default function DailyUsageByKeyChart({ data, keyNames }: DailyUsageByKey
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-4">
-      <h3 className="font-semibold text-gray-900 mb-4">近 7 天各 Key 使用金额</h3>
+      <h3 className="font-semibold text-gray-900 mb-4">近 14 天各 Key 使用金额</h3>
       {data.length === 0 ? (
         <div className="h-64 flex items-center justify-center text-gray-400">暂无数据</div>
       ) : (
