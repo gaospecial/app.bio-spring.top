@@ -61,7 +61,7 @@ interface ModuleDefinition {
 | `llm-usage` | `/llm-usage/*` | API Key 管理、Token 用量统计与图表、明细查询 |
 | `digital-soil` | `/digital-soil/*` | IoT 传感器监控、OHLC 图表、数据查询 |
 | `attendance` | `/attendance/*` | 考勤管理（占位，尚未实现） |
-| `biogas-literature` | `/biogas-literature/*` | 还田科普：文献上传、PDF 解析、LLM 解读、文献问答（admin only） |
+| `biogas-literature` | `/biogas-literature/*` | 还田科普：文献上传、文献管理、LLM 解读、文献问答（需 biogas-literature 模块权限） |
 
 权限过滤：`admin` 角色看到所有模块；普通用户只看到 `user.modules` 数组中的模块。
 
