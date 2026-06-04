@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Badge from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
 import type { ApiKey } from '@/lib/types'
@@ -13,6 +14,18 @@ interface KeyTableProps {
 }
 
 export default function KeyTable({ keys, onEdit, onDelete, onCollect, collecting }: KeyTableProps) {
+  const [copiedId, setCopiedId] = useState<number | null>(null)
+
+  const handleCopy = async (key: ApiKey) => {
+    try {
+      await navigator.clipboard.writeText(key.api_key)
+      setCopiedId(key.id)
+      setTimeout(() => setCopiedId(null), 2000)
+    } catch {
+      /* clipboard not available */
+    }
+  }
+
   return (
     <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
       <table className="w-full text-sm">
@@ -37,7 +50,27 @@ export default function KeyTable({ keys, onEdit, onDelete, onCollect, collecting
               <tr key={key.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3 font-medium">{key.name}</td>
                 <td className="px-4 py-3 text-xs text-gray-500">{key.provider || 'chatanywhere'}</td>
-                <td className="px-4 py-3 font-mono text-xs text-gray-500">{key.api_key}</td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono text-xs text-gray-500 truncate max-w-[200px]">{key.api_key}</span>
+                    <button
+                      onClick={() => handleCopy(key)}
+                      className="shrink-0 p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+                      title="复制 API Key"
+                    >
+                      {copiedId === key.id ? (
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      ) : (
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                          <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                </td>
                 <td className="px-4 py-3 text-xs text-gray-500">{key.base_url}</td>
                 <td className="px-4 py-3 text-center">
                   <Badge variant={key.is_active ? 'success' : 'default'}>
