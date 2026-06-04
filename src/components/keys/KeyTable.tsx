@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Badge from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
+import { revealKey } from '@/lib/api'
 import type { ApiKey } from '@/lib/types'
 
 interface KeyTableProps {
@@ -18,7 +19,8 @@ export default function KeyTable({ keys, onEdit, onDelete, onCollect, collecting
 
   const handleCopy = async (key: ApiKey) => {
     try {
-      await navigator.clipboard.writeText(key.api_key)
+      const revealed = await revealKey(key.id)
+      await navigator.clipboard.writeText(revealed.api_key)
       setCopiedId(key.id)
       setTimeout(() => setCopiedId(null), 2000)
     } catch {

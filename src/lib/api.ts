@@ -137,6 +137,11 @@ export async function collectKey(id: number): Promise<CollectResult> {
   return (res.data as ApiResponse<CollectResult>).data
 }
 
+export async function revealKey(id: number): Promise<{ id: number; api_key: string }> {
+  const res = await api.get(`/api/v1/llm/keys/${id}/reveal`)
+  return (res.data as ApiResponse<{ id: number; api_key: string }>).data
+}
+
 // ── Providers ──
 
 export async function listLlmProviders(): Promise<LlmProviderInfo[]> {
