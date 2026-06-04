@@ -1,14 +1,16 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { getSummary } from '@/lib/api'
-import type { UsageSummary } from '@/lib/types'
+import { getSummary, getDailyUsage } from '@/lib/api'
+import type { UsageSummary, DailyUsage } from '@/lib/types'
 import SummaryCards from '@/components/dashboard/SummaryCards'
 import KeySummaryTable from '@/components/dashboard/KeySummaryTable'
+import DailyUsageByKeyChart from '@/components/charts/DailyUsageByKeyChart'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
 export default function DashboardPage() {
   const [summary, setSummary] = useState<UsageSummary | null>(null)
+  const [dailyUsage, setDailyUsage] = useState<DailyUsage[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -16,8 +18,9 @@ export default function DashboardPage() {
     setLoading(true)
     setError('')
     try {
-      const data = await getSummary()
-      setSummary(data)
+      const [s, d] = await Promise.all([getSummary(), getDailyUsage(7)])
+      setSummary(s)
+      setDailyUsage(d)
     } catch (err) {
       setError(err instanceof Error ? err.message : '加载失败')
     } finally {
@@ -25,11 +28,12 @@ export default function DashboardPage() {
     }
   }, [])
 
-  useEffect(() => { fetchData() }, [fetchData])
-
   if (loading) return <LoadingSpinner />
   if (error) return <div className="text-red-500 p-4">{error}</div>
   if (!summary) return null
+
+  const keyNames: Record<number, string> = {}
+  summary.keys.forEach((k) => { keyNames[k.key_id] = k.key_name })
 
   return (
     <div className="space-y-6">
@@ -44,6 +48,7 @@ export default function DashboardPage() {
         totalUsed={summary.total_used}
         totalRemaining={summary.total_remaining}
       />
+      <DailyUsageByKeyChart data={dailyUsage} keyNames={keyNames} />
       <KeySummaryTable keys={summary.keys} />
     </div>
   )
