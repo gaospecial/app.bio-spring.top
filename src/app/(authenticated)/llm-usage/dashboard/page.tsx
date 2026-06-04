@@ -28,6 +28,8 @@ export default function DashboardPage() {
     }
   }, [])
 
+  useEffect(() => { fetchData() }, [fetchData])
+
   if (loading) return <LoadingSpinner />
   if (error) return <div className="text-red-500 p-4">{error}</div>
   if (!summary) return null
