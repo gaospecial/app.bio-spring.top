@@ -110,6 +110,7 @@ export interface DailyKeyUsage {
   key_id: number
   usage: string
   tokens: number
+  call_count: number
 }
 
 export interface DailyUsage {
