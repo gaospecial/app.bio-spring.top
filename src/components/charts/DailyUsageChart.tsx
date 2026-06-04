@@ -9,9 +9,37 @@ interface DailyUsageChartProps {
   onDaysChange: (days: number) => void
 }
 
+function fillMissingDates(data: DailyUsage[], daysCount: number) {
+  if (data.length === 0) return data
+
+  const sorted = [...data].sort((a, b) => a.date.localeCompare(b.date))
+  const end = new Date(sorted[sorted.length - 1].date)
+  const start = new Date(end)
+  start.setDate(start.getDate() - daysCount + 1)
+
+  const result: DailyUsage[] = []
+  const byDate = new Map(sorted.map((d) => [d.date, d]))
+  const cursor = new Date(start)
+
+  while (cursor <= end) {
+    const key = cursor.toISOString().slice(0, 10)
+    result.push(
+      byDate.get(key) ?? {
+        date: key,
+        total_usage: '0',
+        total_tokens: 0,
+        keys: [],
+      },
+    )
+    cursor.setDate(cursor.getDate() + 1)
+  }
+  return result
+}
+
 export default function DailyUsageChart({ data, days, onDaysChange }: DailyUsageChartProps) {
-  const dates = data.map((d) => d.date)
-  const usages = data.map((d) => parseFloat(d.total_usage))
+  const full = fillMissingDates(data, days)
+  const dates = full.map((d) => d.date)
+  const usages = full.map((d) => parseFloat(d.total_usage))
 
   const option = {
     tooltip: {
