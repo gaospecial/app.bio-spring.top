@@ -12,8 +12,10 @@ export const CROP_OPTIONS = [
   { label: '花生', value: '花生' },
   { label: '番茄', value: '番茄' },
   { label: '黄瓜', value: '黄瓜' },
+  { label: '西葫芦', value: '西葫芦' },
   { label: '白菜', value: '白菜' },
   { label: '生菜', value: '生菜' },
+  { label: '空心菜', value: '空心菜' },
   { label: '辣椒', value: '辣椒' },
   { label: '茄子', value: '茄子' },
   { label: '西瓜', value: '西瓜' },
@@ -25,6 +27,7 @@ export const CROP_OPTIONS = [
   { label: '葡萄', value: '葡萄' },
   { label: '柑橘', value: '柑橘' },
   { label: '香蕉', value: '香蕉' },
+  { label: '未知', value: '未知' },
 ] as const
 
 export const SLURRY_TYPE_OPTIONS = [

@@ -33,7 +33,7 @@ export default function ArticleEditModal({ open, article, onClose, onSave, savin
     category: '',
     status: '',
     slurry_type: '',
-    crop: '',
+    crop: [] as string[],
     soil_type: '',
     dosage: '',
     application_method: '',
@@ -54,7 +54,7 @@ export default function ArticleEditModal({ open, article, onClose, onSave, savin
         category: article.category ?? '',
         status: article.status ?? 'published',
         slurry_type: article.slurry_type ?? '',
-        crop: article.crop ?? '',
+        crop: article.crop ?? [],
         soil_type: article.soil_type ?? '',
         dosage: article.dosage ?? '',
         application_method: article.application_method ?? '',
@@ -70,7 +70,7 @@ export default function ArticleEditModal({ open, article, onClose, onSave, savin
 
   if (!article) return null
 
-  const update = (key: string, value: string) => setForm((prev) => ({ ...prev, [key]: value }))
+  const update = (key: string, value: string | string[]) => setForm((prev) => ({ ...prev, [key]: value }))
 
   const addPoint = () => {
     if (newPoint.trim()) {
@@ -87,6 +87,7 @@ export default function ArticleEditModal({ open, article, onClose, onSave, savin
     onSave(article.id, {
       ...form,
       category: form.category || null,
+      crop: form.crop.length > 0 ? form.crop : null,
       understanding_points: points.length > 0 ? points : null,
     })
   }
@@ -116,7 +117,7 @@ export default function ArticleEditModal({ open, article, onClose, onSave, savin
 
         <div className="grid grid-cols-2 gap-4">
           <Select label="沼液类型" options={[{ label: '未指定', value: '' }, ...SLURRY_TYPE_OPTIONS]} value={form.slurry_type} onChange={(e) => update('slurry_type', e.target.value)} />
-          <Select label="作物" options={[{ label: '未指定', value: '' }, ...CROP_OPTIONS]} value={form.crop} onChange={(e) => update('crop', e.target.value)} />
+          <Select label="作物" options={CROP_OPTIONS} multiple value={form.crop} onChange={(value) => update('crop', value)} />
         </div>
 
         <div className="grid grid-cols-2 gap-4">

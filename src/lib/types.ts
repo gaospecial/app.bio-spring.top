@@ -291,7 +291,7 @@ export type BiogasArticle = {
   category: string | null
   tags: string[] | null
   slurry_type: string | null
-  crop: string | null
+  crop: string[] | null
   soil_type: string | null
   dosage: string | null
   application_method: string | null
