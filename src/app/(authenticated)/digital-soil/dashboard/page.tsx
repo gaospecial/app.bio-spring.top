@@ -42,10 +42,6 @@ export default function DigitalSoilDashboard() {
       const opt = RANGE_OPTIONS.find(o => o.key === timeRange) ?? RANGE_OPTIONS[0]
       const end = new Date()
       const start = new Date(end.getTime() - opt.days * 24 * 60 * 60 * 1000)
-      const toLocalISO = (d: Date) => {
-        const pad = (n: number) => String(n).padStart(2, '0')
-        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
-      }
       const results = await Promise.all(
         sensorList
           .filter(s => s.latest_value !== null)
@@ -53,8 +49,8 @@ export default function DigitalSoilDashboard() {
             try {
               const ohlc = await getSensorOHLC(s.id, {
                 interval: opt.interval,
-                start: toLocalISO(start),
-                end: toLocalISO(end),
+                start: start.toISOString(),
+                end: end.toISOString(),
               })
               return { id: s.id, ohlc }
             } catch {
